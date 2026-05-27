@@ -30,7 +30,10 @@ jobs:
         run: python -m pip install -r requirements.txt
 
       - name: Build the JupyterLite site
-        run: jupyter lite build --contents content --output-dir dist
+        run: |
+          rm -f jupyter-lite.json
+          jupyter lite build --contents content --output-dir dist
+          touch dist/.nojekyll
 
       - name: Drop in the custom course homepage
         run: cp homepage/index.html dist/index.html
