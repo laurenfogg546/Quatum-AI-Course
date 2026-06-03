@@ -47,6 +47,23 @@
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
     font-size: 0.8rem; letter-spacing: 0.5px; text-transform: uppercase; position: relative;
   }
+  .hero-actions {
+    position: relative; margin-top: 26px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  }
+  .hero-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 10px; font-weight: 600; font-size: 1rem;
+    text-decoration: none; transition: transform .12s ease, background .12s ease;
+    cursor: pointer; border: none;
+  }
+  .hero-btn.primary   { background: #fff; color: var(--purple); }
+  .hero-btn.secondary { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.35); }
+  .hero-btn:hover     { transform: translateY(-2px); }
+  .you-are {
+    position: relative; margin-top: 18px; font-size: 0.92rem; opacity: 0.85;
+  }
+  .you-are a { color: #fff; text-decoration: underline; cursor: pointer; }
+
   .wrap { max-width: 980px; margin: -44px auto 0; padding: 0 24px 60px; position: relative; }
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
   .card {
@@ -71,9 +88,16 @@
     display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     background: var(--purple); color: #fff; text-decoration: none; font-weight: 600;
     padding: 13px 20px; border-radius: 10px; font-size: 1rem; transition: background .15s ease;
+    cursor: pointer; border: none;
   }
   .launch:hover { background: var(--purple-dark); }
   .launch svg { width: 18px; height: 18px; }
+  .progress-pill {
+    display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 999px;
+    font-size: 0.78rem; background: #f1efff; color: var(--purple-dark); font-weight: 600;
+  }
+  .progress-pill.done { background: #d8f3ef; color: #1f6d63; }
+
   .how {
     margin-top: 44px; background: #fff; border-radius: 16px; padding: 28px 32px;
     border: 1px solid #ece8f5; box-shadow: 0 8px 24px rgba(40,20,80,0.06);
@@ -88,6 +112,30 @@
   footer { text-align: center; color: var(--muted); font-size: 0.85rem; padding: 30px 24px 50px; }
   .footer-links { margin-top: 8px; }
   .footer-links a { color: var(--purple); text-decoration: none; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(20,12,40,0.55); display: none;
+    align-items: center; justify-content: center; padding: 20px; z-index: 100;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: #fff; border-radius: 16px; padding: 28px; max-width: 420px; width: 100%;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  }
+  .modal h3 { color: var(--purple); margin-bottom: 8px; font-size: 1.25rem; }
+  .modal p  { color: var(--muted); font-size: 0.95rem; margin-bottom: 14px; }
+  .modal input {
+    width: 100%; padding: 11px 13px; font-size: 1rem; border: 1px solid #d4cce8;
+    border-radius: 8px; margin-bottom: 12px; font-family: inherit;
+  }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  .modal-actions button {
+    padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer;
+    font-weight: 600; font-size: 0.95rem;
+  }
+  .modal-actions .cancel { background: #eee; color: var(--ink); }
+  .modal-actions .ok     { background: var(--purple); color: #fff; }
 </style>
 </head>
 <body>
@@ -96,13 +144,23 @@
     <h1>Quantum Computing for AI</h1>
     <p>A hands-on, interactive course. Read the lessons, run real code, and watch the
        animations, all live in your browser. Nothing to download.</p>
+
+    <div class="hero-actions">
+      <a class="hero-btn primary"   id="signup-btn"   href="#" target="_blank" rel="noopener">
+        Sign up
+      </a>
+      <button class="hero-btn secondary" id="login-btn">
+        I already signed up
+      </button>
+    </div>
+    <div class="you-are" id="you-are"></div>
   </header>
 
   <main class="wrap">
     <div class="cards">
 
       <!-- UNIT 1 -->
-      <section class="card">
+      <section class="card" data-unit="1">
         <div class="unit-tag">Unit 1</div>
         <h2>Foundations of Quantum Computing</h2>
         <p class="desc">The building blocks: bits vs. qubits, superposition, measurement,
@@ -114,15 +172,17 @@
           <li>Entanglement &amp; the CNOT gate</li>
         </ul>
         <a class="launch" target="_blank" rel="noopener"
+           data-unit="1"
            href="https://colab.research.google.com/github/laurenfogg546/Quatum-AI-Course/blob/main/content/Unit1_Foundations.ipynb">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Launch Unit 1 in Colab
         </a>
+        <span class="progress-pill" data-progress="1">Not started</span>
       </section>
 
       <!-- UNIT 2 -->
-      <section class="card">
+      <section class="card" data-unit="2">
         <div class="unit-tag">Unit 2</div>
         <h2>Quantum Algorithms for AI</h2>
         <p class="desc">The four building blocks behind every AI-relevant quantum algorithm,
@@ -134,15 +194,17 @@
           <li>Sampling &amp; probability distributions</li>
         </ul>
         <a class="launch" target="_blank" rel="noopener"
+           data-unit="2"
            href="https://colab.research.google.com/github/laurenfogg546/Quatum-AI-Course/blob/main/content/Unit2_Quantum_AI_Course.ipynb">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Launch Unit 2 in Colab
         </a>
+        <span class="progress-pill" data-progress="2">Not started</span>
       </section>
-      
-<!-- UNIT 3 -->
-      <section class="card">
+
+      <!-- UNIT 3 -->
+      <section class="card" data-unit="3">
         <div class="unit-tag">Unit 3</div>
         <h2>Quantum Machine Learning</h2>
         <p class="desc">Build actual quantum ML models from scratch and watch a classifier's
@@ -154,16 +216,17 @@
           <li>Quantum Kernel Models</li>
         </ul>
         <a class="launch" target="_blank" rel="noopener"
+           data-unit="3"
            href="https://colab.research.google.com/github/laurenfogg546/Quatum-AI-Course/blob/main/content/Unit3.ipynb">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Launch Unit 3 in Colab
         </a>
+        <span class="progress-pill" data-progress="3">Not started</span>
       </section>
-    </div>
 
-    <!-- UNIT 4 -->
-      <section class="card">
+      <!-- UNIT 4 -->
+      <section class="card" data-unit="4">
         <div class="unit-tag">Unit 4</div>
         <h2>Quantum Optimization for AI</h2>
         <p class="desc">From classical gradient descent to VQE and QAOA: how quantum
@@ -175,32 +238,178 @@
           <li>Applications: feature selection, clustering, more</li>
         </ul>
         <a class="launch" target="_blank" rel="noopener"
+           data-unit="4"
            href="https://colab.research.google.com/github/laurenfogg546/Quatum-AI-Course/blob/main/content/Unit4_Quantum_Optimization.ipynb">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
           Launch Unit 4 in Colab
         </a>
+        <span class="progress-pill" data-progress="4">Not started</span>
       </section>
-    
+
+    </div>
+
     <section class="how">
       <h3>How to use this course</h3>
       <ol>
-        <li>Click a <strong>Launch</strong> button above and the notebook opens right in your browser.</li>
-        <li>Run each cell top-to-bottom with <strong>Shift + Enter</strong>, or use <em>Run → Run All Cells</em>.</li>
-        <li>The first cell loads the libraries; give it a few seconds the first time.</li>
-        <li>Edit the code in the activity cells and re-run to experiment. You can't break anything.</li>
+        <li>Click <strong>Sign up</strong> above and fill in your name and email. You only do this once.</li>
+        <li>Then click a <strong>Launch</strong> button on any unit and the notebook opens in your browser.</li>
+        <li>Run each cell top-to-bottom with <strong>Shift + Enter</strong>, or use <em>Run &rarr; Run All Cells</em>.</li>
+        <li>At the end of every unit, fill in the short check-in form. After all 4 units are complete, you will receive a certificate by email.</li>
       </ol>
       <div class="note">
-        Everything runs locally in your browser using JupyterLite, so some heavier cells
-        (training loops, kernel matrices) may take 30 to 60 seconds. A cell is still working
-        while it shows <code>[*]</code>.
+        Already signed up? Click <strong>I already signed up</strong> and enter your email. Your progress pills will update to show which units you have finished.
       </div>
     </section>
   </main>
 
   <footer>
     Quantum Computing for AI · Interactive coursebook
-    <div class="footer-links">Powered by JupyterLite. Runs entirely in the browser.</div>
+    <div class="footer-links">Made with love · Tracking powered by Google Sheets</div>
   </footer>
+
+  <!-- Email entry modal -->
+  <div class="modal-overlay" id="email-modal">
+    <div class="modal">
+      <h3>What is your email?</h3>
+      <p>So we can track your progress and send your certificate when you finish.</p>
+      <input type="email" id="email-input" placeholder="you@example.com" autocomplete="email">
+      <div class="modal-actions">
+        <button class="cancel" id="email-cancel">Cancel</button>
+        <button class="ok"     id="email-ok">Save</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/*
+ * Course tracking glue.
+ *
+ * Configure these two URLs after deploying the Apps Script Web App
+ * and creating the sign-up Google Form.
+ */
+const TRACKER_URL = "https://script.google.com/macros/s/AKfycbyp01BDLgzqHk5HbYt7Tl0hYESKo4qRs8AMJsFKUfbNKdbUuzjT6yb1L2qVFd_oz2Ur/exec";
+const SIGNUP_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSdltqmCLF16aumjDS-aRJd5uPUQOXMAyVYRA3_DsH4sK4vTag/viewform?usp=header";
+
+// ---- Local email cache ----
+function getEmail() { return localStorage.getItem("course_email") || ""; }
+function setEmail(em) {
+  em = (em || "").trim().toLowerCase();
+  if (em) localStorage.setItem("course_email", em);
+  return em;
+}
+
+// ---- Server calls (fire-and-forget; we don't block the user on the network) ----
+function logEvent(eventType, extra) {
+  if (!TRACKER_URL || TRACKER_URL.startsWith("PASTE_")) return;     // not configured yet
+  const body = Object.assign({
+    event_type: eventType,
+    email: getEmail()
+  }, extra || {});
+  try {
+    fetch(TRACKER_URL, {
+      method: "POST",
+      mode:   "no-cors",            // avoids CORS preflight on Apps Script
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(body)
+    });
+  } catch (e) { /* swallow - we never want tracking to break the page */ }
+}
+
+async function fetchProgress(email) {
+  if (!TRACKER_URL || TRACKER_URL.startsWith("PASTE_")) return [];
+  try {
+    const r = await fetch(TRACKER_URL + "?email=" + encodeURIComponent(email));
+    const j = await r.json();
+    return j.completed_units || [];
+  } catch (e) { return []; }
+}
+
+// ---- UI ----
+function showModal()  { document.getElementById("email-modal").classList.add("show"); }
+function hideModal()  { document.getElementById("email-modal").classList.remove("show"); }
+
+function renderYouAre() {
+  const yaRow = document.getElementById("you-are");
+  const em = getEmail();
+  if (em) {
+    yaRow.innerHTML = "Signed in as <strong>" + em + "</strong>. " +
+                      "<a id='change-email'>Use a different email</a>";
+    document.getElementById("change-email").onclick = () => { localStorage.removeItem("course_email"); renderYouAre(); refreshProgress(); };
+  } else {
+    yaRow.innerHTML = "";
+  }
+}
+
+function setProgressPill(unit, done) {
+  const pill = document.querySelector('.progress-pill[data-progress="'+unit+'"]');
+  if (!pill) return;
+  if (done) { pill.classList.add("done"); pill.textContent = "Completed"; }
+  else      { pill.classList.remove("done"); pill.textContent = "Not started"; }
+}
+
+async function refreshProgress() {
+  const em = getEmail();
+  // reset all pills first
+  document.querySelectorAll(".progress-pill").forEach(p => setProgressPill(p.dataset.progress, false));
+  if (!em) return;
+  const done = await fetchProgress(em);
+  done.forEach(u => setProgressPill(u, true));
+}
+
+// ---- Wiring ----
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Sign-up button: open Google Form in new tab + log the click
+  const signupBtn = document.getElementById("signup-btn");
+  if (SIGNUP_FORM_URL && !SIGNUP_FORM_URL.startsWith("PASTE_")) {
+    signupBtn.href = SIGNUP_FORM_URL;
+  }
+  signupBtn.addEventListener("click", () => {
+    logEvent("signup_clicked");
+    // Prompt them to come back and enter their email afterwards.
+    setTimeout(() => {
+      if (!getEmail()) {
+        showModal();
+        document.getElementById("email-input").placeholder = "the email you signed up with";
+      }
+    }, 1500);
+  });
+
+  // "I already signed up" / change email button
+  document.getElementById("login-btn").addEventListener("click", () => {
+    showModal();
+    document.getElementById("email-input").value = getEmail();
+  });
+
+  // Modal buttons
+  document.getElementById("email-cancel").addEventListener("click", hideModal);
+  document.getElementById("email-ok").addEventListener("click", () => {
+    const v = document.getElementById("email-input").value;
+    if (!v || !v.includes("@")) { alert("Please enter a valid email."); return; }
+    setEmail(v);
+    hideModal();
+    renderYouAre();
+    refreshProgress();
+    logEvent("identified");
+  });
+
+  // Launch button clicks: log them
+  document.querySelectorAll(".launch").forEach(link => {
+    link.addEventListener("click", () => {
+      if (!getEmail()) {
+        // Don't block them — let them open the notebook, but ask for email after.
+        setTimeout(() => { if (!getEmail()) showModal(); }, 500);
+      }
+      logEvent("launch_clicked", { unit: Number(link.dataset.unit) });
+    });
+  });
+
+  // Initial render
+  renderYouAre();
+  refreshProgress();
+  logEvent("homepage_visited");
+});
+</script>
 </body>
 </html>
